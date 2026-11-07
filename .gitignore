@@ -1,0 +1,43 @@
+# Delphi Compiler & Linker output
+*.dcu
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.drc
+*.map
+*.o
+*.obj
+*.ppu
+
+# Delphi Backup & Temporary files
+*.~*
+*.dsk
+*.rsm
+*.local
+*.identcache
+*.stat
+*.tvsconfig
+*.2007
+*.2008
+*.2009
+*.2010
+*.opt
+*.bak
+*.ddp
+
+# Delphi Project temporary files
+__history/
+__recovery/
+ModelSupport_*/
+
+# OS / Editor specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+*.log
+
+# Git / Assistant Scratch directory
+scratch/

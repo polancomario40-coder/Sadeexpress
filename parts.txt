@@ -1,0 +1,95 @@
+    object Label16: TLabel
+      Left = 403
+      Top = 84
+      Width = 42
+      Height = 13
+      Caption = 'Aplica A:'
+    end
+|||    object cxDBButtonEdit1: TcxDBButtonEdit
+      Left = 449
+      Top = 80
+      Width = 101
+      Height = 21
+      DataBinding.DataField = 'idDocumento'
+      DataBinding.DataSource = DS
+      Properties.Buttons = <
+        item
+          Default = True
+          Kind = bkEllipsis
+        end>
+      Properties.ReadOnly = True
+      Properties.OnButtonClick = cxDBButtonEdit1PropertiesButtonClick
+      Style.LookAndFeel.NativeStyle = True
+      TabOrder = 19
+    end
+|||    object cxDBTextEdit1: TcxDBTextEdit
+      Left = 551
+      Top = 80
+      Width = 196
+      Height = 21
+      DataBinding.DataField = 'NcfModificado'
+      DataBinding.DataSource = DS
+      TabOrder = 20
+    end
+|||    object TabSheet1: TTabSheet
+      Caption = 'Info ECF'
+      ImageIndex = 3
+      DesignSize = (
+        738
+        223)
+      object Label35: TLabel
+        Left = 5
+        Top = 7
+        Width = 36
+        Height = 13
+        Caption = 'Estado:'
+      end
+      object Label34: TLabel
+        Left = 6
+        Top = 47
+        Width = 74
+        Height = 13
+        Caption = 'Cod. seguridad:'
+      end
+      object dxDBEdit27: TdxDBEdit
+        Left = 4
+        Top = 19
+        Width = 116
+        Enabled = False
+        TabOrder = 0
+        Anchors = [akLeft, akTop, akRight]
+        DataField = 'StatusEcf'
+        DataSource = dsEcfStatus
+        StyleController = dm.dxEstilo
+      end
+      object dxDBEdit26: TdxDBEdit
+        Left = 5
+        Top = 61
+        Width = 116
+        Enabled = False
+        TabOrder = 1
+        Anchors = [akLeft, akTop, akRight]
+        DataField = 'CodigoSeguridadEcf'
+        DataSource = dsEcfStatus
+        StyleController = dm.dxEstilo
+      end
+      object cxDBMemo1: TcxDBMemo
+        Left = 155
+        Top = 10
+        Width = 573
+        Height = 92
+        TabStop = False
+        DataBinding.DataField = 'ultError'
+        DataBinding.DataSource = dsEcfStatus
+        Properties.ReadOnly = True
+        Style.LookAndFeel.NativeStyle = True
+        TabOrder = 2
+      end
+    end
+|||  object dsEcfStatus: TwwDataSource
+    AutoEdit = False
+    DataSet = dm.rsEcfStatus
+    OnUpdateData = DSUpdateData
+    Left = 586
+    Top = 339
+  end

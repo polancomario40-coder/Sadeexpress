@@ -1,0 +1,3 @@
+IF NOT EXISTS(SELECT 1 FROM Defaults WHERE Clave = 'AUTO_ENVIAR_ECF') INSERT INTO Defaults (Clave, Valor) VALUES ('AUTO_ENVIAR_ECF', '0');                                                                                                                      
+IF NOT EXISTS(SELECT 1 FROM Defaults WHERE Clave = 'USAR_ECF') INSERT INTO Defaults (Clave, Valor) VALUES ('USAR_ECF', '1');                                                                                                                                    
+IF NOT EXISTS(SELECT 1 FROM Defaults WHERE Clave = 'UsarEcfs') INSERT INTO Defaults (Clave, Valor) VALUES ('UsarEcfs', '1');                                                                                                                                    

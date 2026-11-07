@@ -1,0 +1,149 @@
+--- NEW TABLES ---
+ecf_compfiscal_log
+ecf_status_envio
+
+--- MODIFIED TABLES (NEW COLUMNS) ---
+Cxc: PendValidacion, CodigoSeguridadEcf, NcfModificado, FechaFirmaDigital, UltError, TipoNcfModificado, FechaNcfModificado, HoraEnvio, idTipoIngreso, TipoNcf, PendEnvioEcf, StatusEcf, TrackId, FechaVenceNCF, cliente
+Factura: PendValidacion, CodigoSeguridadEcf, FechaFirmaDigital, UltError, TipoDocumento, HoraEnvio, TipoNcf, PendEnvioEcf, FecSaldo, StatusEcf, TrackId, cliente
+FacturaDet: fecha, referencia
+CompFiscal: Longitud
+Cliente: TipoNCFEmp, RNCEmP, OCRequerida, fecnac, Monto_Bono_Mortero, RequiereOrdenCliente, NoRecibirConduces, cliente
+Devolucion: PendValidacion, CodigoSeguridadEcf, NcfModificado, FechaFirmaDigital, UltError, FechaNcfModificado, HoraEnvio, TipoNcf, PendEnvioEcf, StatusEcf, TrackId, FechaVenceNCF, CompFiscal
+cxpDocumentos: PendValidacion, CodigoSeguridadEcf, FechaFirmaDigital, UltError, CompFiscalModificado, HoraEnvio, TipoNcf, FechaRegistro, PendEnvioEcf, Usuario, RetenerTotalFactura, TrackId, FechaVenceNCF, StatusEcf, IdClaseGastoModificado, FechaCompFiscalModificado
+tmp: grupo, existencia, costo, codigo, marca, precio
+bcoGastosMenores: PendValidacion, CodigoSeguridadEcf, FechaFirmaDigital, UltError, HoraEnvio, TipoNcf, FechaRegistro, PendEnvioEcf, StatusEcf, TrackId, FechaVenceNCF, IdPagoForma, Cancelado
+
+--- NEW ECF SPs ---
+Total: 31
+
+--- MODIFIED EXISTING SPs ---
+svFactura2ProMov
+svrsFacturaCobro
+rsCompFiscal
+svrsFacturaPag
+ClienteAct
+eduRsCliente
+cxcDatosEstadoxFactura
+ClienteBalanceList
+ClienteCxCList
+Clienteinact
+svFindClientecentral
+ClienteObraList
+ocCompraPendiente
+svSalidaCompuesto2Promov
+presRSCliente
+ClienteRpt
+ClienteRpt02
+Clientes
+svSubClientesCliente
+ocDiarioCompras
+ocDiarioComprasDetallado
+ocDiarioComprasResumido
+ws_lg_ConsumosCliente
+Conduce2Factura
+svVentaporClienteAnual
+Conduce2FacturaDet
+svVentaporClienteAnualporVendedor
+BusqTestClientes
+svVentaporClienteAnualporVendedorDet
+pvListaclientesParcial
+svVentaProductoporCliente
+Factura2Conduce
+svVentasPorClienteSeg
+RPTFactura
+svVentasPorProdCliente
+Factura2CxCpornumero
+contRsCompromiso
+Factura2Dev
+FindCliente
+rsFactura
+rsFacturaConduce
+svFindCliente
+rsFacturaDet
+rsFacturaDetEspec
+pvFacturasAbiertas
+rsFacturaRec
+svBuscarCompFiscal
+FindClienteActivo
+svFactura2Recibo
+rsFacturaRecDet
+Factura2NCInterna
+Factura2CxC
+OrdComp2Fact
+svClienteBalanceRpt
+frGenerarFactura
+svClienteNotasList
+svClientePorSub
+svFacturas608List
+FindFactura
+svFacturasToDgiiResumen2018
+FindFacturaFR
+svFacturasToDgii2018
+rsOrdComp
+rsOrdCompDet
+svRenumerarFactura
+rsOrdCompDetalle
+svGenFacturaNDPresupuesto
+svBuscarNumFactCliente
+svConsumoClienteporCategoria
+svCostoCompuesto2Promov
+tsProyectoSelectByIdCliente
+svCompFiscal
+FindOrdComp
+rsCompFiscalSecuencia
+BifrFactura
+SPFacturaAnular
+rssFacturadoyCobrado
+rssFacturadoyCobradoGrafico
+svEntradaCompuesto2Promov
+svFacturasToDgii
+rssFacturaProducto
+tsTimeSheetSelectByIdCliente
+svFacturacionMes
+svFacturaPag2CxC
+svFacturaPagAnular
+spfrNotasFacturas
+svFacturarNDPresupuesto
+CarteradeClientes
+svFacturasAbiertas
+cxcClienteLimiteCrBalanceRpt
+svFacturasCanceladas
+cxcNotasGestionCobrosCliente
+VentasPorCliente
+svFacturasXCobrador
+svFacturasXTipoNave
+svGenCodifFactura
+svGenCodificacionFacturas
+GetFacturaDetEspec
+cxcListaClientesDepurar
+svHistorialCliente
+svHistoricoCliente
+svImpFactura
+svMarcarFacturaCobrada
+svOrdCompEnt
+svOrdCompEnt2ProMov
+svOrdCompEntDet
+eduClienteActivo
+svOrdCompEntList
+svOrdCompPendiente
+svOrdCompSetStatus
+RPTFacturacion
+RPTFacturaList
+eduFindCliente
+RPTOrdCompProg
+presClienteAct
+svRecodificarFacturas
+presClienteList
+SPFacturaesAnulable
+presFindCliente
+svRSClienteContacto
+svrsClientePag
+eduListClienteHijo
+rsCliente
+svRsClienteTipoCuenta
+eduListCursoCliente
+rsClienteDet
+mantOT2SolCompra
+RSClienteOpcion
+svRSCuentaCliente
+RSClienteOpcionTipo

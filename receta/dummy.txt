@@ -1,0 +1,15 @@
+import os
+import re
+
+for folder in ['003_Nuevos_SPs', '004_SPs_Modificados']:
+    path = os.path.join('receta', folder)
+    if not os.path.exists(path): continue
+    for f_name in os.listdir(path):
+        if not f_name.endswith('.sql'): continue
+        f_path = os.path.join(path, f_name)
+        with open(f_path, 'r', encoding='utf-8') as f:
+            code = f.read()
+        
+        if len(code) == 0:
+            # We need to extract it from schema_Express.json again!
+            pass
