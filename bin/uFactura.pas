@@ -958,7 +958,7 @@ begin
   end;
   if (appestado in [appInsert, appEdit]) then begin
     dxDBEdit11.ReadOnly := not PermiteEditarCliente;
-    RSCliente.ReadOnly := not PermiteEditarCliente;
+    RSCliente.ReadOnly := False;
     TcxButtonEditProperties(cxGridProducto.Properties).ReadOnly := not PermiteEditarCliente;
   end;
 
@@ -1041,7 +1041,7 @@ begin
   bSendEcf.Enabled := False;
   FindCliente.enabled := true;
   dxDBEdit11.ReadOnly := not PermiteEditarCliente;
-  RSCliente.ReadOnly := not PermiteEditarCliente;
+  RSCliente.ReadOnly := False;
   TcxButtonEditProperties(cxGridProducto.Properties).ReadOnly := not PermiteEditarCliente;
   //Cod.ReadOnly :=true;
   AAnular.Enabled := false;
@@ -1062,7 +1062,7 @@ begin
   bSendEcf.Enabled := False;
   FindCliente.enabled := true;
   dxDBEdit11.ReadOnly := not PermiteEditarCliente;
-  RSCliente.ReadOnly := not PermiteEditarCliente;
+  RSCliente.ReadOnly := False;
   TcxButtonEditProperties(cxGridProducto.Properties).ReadOnly := not PermiteEditarCliente;
 //  Cod.ReadOnly :=true;
   AAnular.Enabled := false;
@@ -1088,7 +1088,7 @@ begin
 
   FindCliente.enabled := false;
   dxDBEdit11.ReadOnly := True;
-  RSCliente.ReadOnly := True;
+  RSCliente.ReadOnly := False;
   TcxButtonEditProperties(cxGridProducto.Properties).ReadOnly := True;
 
   ACotizacion.Enabled := true;
@@ -1856,8 +1856,8 @@ begin
     end;
     rsCliente.Value := ClienteActCliente.AsString;
     dxDBEdit11.ReadOnly := not PermiteEditarCliente;
-    RSCliente.ReadOnly := not PermiteEditarCliente;
-    TcxButtonEditProperties(cxGridProducto.Properties).ReadOnly := not PermiteEditarCliente;
+    RSCliente.ReadOnly := False;
+
       rsTipoNcf.Value := ClienteActTipoCompFiscal.AsString;
 
     if (ClienteActidEmpleado.isnull) or (ClienteActidEmpleado.AsString = '') then
@@ -2887,7 +2887,8 @@ begin
 
     if rsCompFiscal.Asstring = ''  then
     begin
-    if   (RSCredito.value=False) or (RSidCondicion.AsString ='CreditoconNCF')  then     //'CreditoconNCF'
+    // Si no es credito, si la condicion es CreditoconNCF, o si el parametro FACT_CREDITO_NCF esta activo (por defecto <> '0')
+    if (RSCredito.value=False) or (RSidCondicion.AsString ='CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
     begin
       rsTipoDocumento.value:='FACTURA' ;
       sec := dm.GetCompFiscal(ComputerName(), rsTipoNCF.Value);
@@ -2904,12 +2905,12 @@ begin
    end;
   end
     else
-    if rsDatosEstadoBalance.Value<>0  then
+    if (rsDatosEstadoBalance.Value<>0) and (dm.GetDefaultStr('FACT_CREDITO_NCF') = '0') and (RSidCondicion.AsString <> 'CreditoconNCF') then
     rsTipoDocumento.value:='PROFORMA'
     else
       begin
 
-         if (rsCompFiscal.Asstring = '')  or (RSidCondicion.AsString='CreditoconNCF') then
+         if (rsCompFiscal.Asstring = '') or (RSidCondicion.AsString='CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
          begin
          sec := dm.GetCompFiscal(ComputerName(), rsTipoNCF.Value);
          if sec.Cancelado = False then

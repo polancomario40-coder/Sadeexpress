@@ -1,20 +1,14 @@
-﻿-- ==============================================================================
--- Script: script_Client_EDIT_CLI.sql
+-- ==============================================================================
+-- Script: 01_script_Client_EDIT_CLI.sql
 -- Proposito: 
 --  1. Modificar columnas 'Telefono' y 'fecnac' en tabla Cliente para permitir NULL.
 --  2. Limpiar datos existentes en Cliente con telefonos vacios/mascaras o fechas dummy a NULL.
---  3. Registrar/actualizar el parametro 'Client_EDIT_CLI' en la tabla Defaults:
+--  3. Crear o actualizar el procedimiento findClienteTel.
+--  4. Registrar/actualizar el parametro 'Client_EDIT_CLI' en la tabla Defaults:
 --     - En uFactura: Valor = '1' -> Permite editar el nombre del cliente en la factura.
 --     - En uCliente: Valor = '0' -> Permite guardar nulo en telefono y fecha de nacimiento.
 -- Compatible con SQL Server 2008 / 2012 / 2014 / 2016 / 2017 / 2019 / 2022.
--- Go
-
-go
-CREATE PROCEDURE [dbo].[findClienteTel](@Telefono varchar(20),@FecNac datetime) AS  
-  
-select * from cliente where Telefono = @Telefono and fecnac=@FecNac  
-go
-
+-- ==============================================================================
 
 SET NOCOUNT ON;
 PRINT 'Iniciando actualizacion para Client_EDIT_CLI...';
@@ -78,7 +72,19 @@ WHERE fecnac IS NOT NULL
 PRINT 'Datos en Cliente actualizados.';
 GO
 
--- 4. Registrar o actualizar el parametro 'Client_EDIT_CLI' en la tabla Defaults
+-- 4. Crear o reemplazar procedimiento findClienteTel
+IF OBJECT_ID('dbo.findClienteTel', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.findClienteTel;
+GO
+
+CREATE PROCEDURE [dbo].[findClienteTel](@Telefono varchar(20), @FecNac datetime) AS  
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM dbo.Cliente WHERE Telefono = @Telefono AND fecnac = @FecNac;
+END
+GO
+
+-- 5. Registrar o actualizar el parametro 'Client_EDIT_CLI' en la tabla Defaults
 IF NOT EXISTS (SELECT 1 FROM dbo.Defaults WHERE Clave = 'Client_EDIT_CLI')
 BEGIN
     PRINT 'Insertando parametro Client_EDIT_CLI en Defaults...';
@@ -87,7 +93,7 @@ BEGIN
         'Client_EDIT_CLI', 
         CAST('1' AS sql_variant),  -- '1' = Permite editar cliente en factura; '0' = Permite nulo en tel/fecnac en uCliente
         'Permite editar cliente en fact (1=Si) / Permite nulo tel-fecnac (0=Si)', 
-        'VENTAS', 
+        'ECF', 
         'A', 
         NEWID()
     );
@@ -99,7 +105,7 @@ BEGIN
     UPDATE dbo.Defaults 
     SET Valor = CAST('1' AS sql_variant),
         Descripcion = 'Permite editar cliente en fact (1=Si) / Permite nulo tel-fecnac (0=Si)',
-        Categoria = ISNULL(Categoria, 'VENTAS')
+        Categoria = 'ECF'
     WHERE Clave = 'Client_EDIT_CLI';
     PRINT 'Parametro Client_EDIT_CLI actualizado con exito.';
 END
