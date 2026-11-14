@@ -627,6 +627,12 @@ begin
   mDocumentoTipoGasto.Value := 'COSTO';
   mDocumentomontoFacturadoServicios.Value := 0;
   mDocumentomontoFacturadoBienes.Value := 0;
+  mDocumentoMontoIsc.Value := 0;
+  mDocumentoPropinaLegal.Value := 0;
+  mDocumentoOtrosImpuestos.Value := 0;
+  mDocumentoItbisCosto.Value := 0;
+  mDocumentoPendEnvioEcf.Value := False;
+  mDocumentoStatusEcf.Value := 'PENDIENTE';
 
   //AutoIncluirImpuestos();
 
@@ -849,11 +855,31 @@ begin
       else
         Parameters[36].Value := 'COSTO';
 
-      Parameters[39].Value := mDocumentoMontoIsc.Value;
-      Parameters[40].Value := mDocumentoPropinaLegal.Value;
-      Parameters[41].Value := mDocumentoOtrosImpuestos.Value;
-      Parameters[42].Value := mDocumentoItbisCosto.Value;
-      Parameters[43].Value := mDocumentoPendEnvioEcf.Value;
+      if mDocumentoMontoIsc.IsNull then
+        Parameters[39].Value := 0
+      else
+        Parameters[39].Value := mDocumentoMontoIsc.Value;
+
+      if mDocumentoPropinaLegal.IsNull then
+        Parameters[40].Value := 0
+      else
+        Parameters[40].Value := mDocumentoPropinaLegal.Value;
+
+      if mDocumentoOtrosImpuestos.IsNull then
+        Parameters[41].Value := 0
+      else
+        Parameters[41].Value := mDocumentoOtrosImpuestos.Value;
+
+      if mDocumentoItbisCosto.IsNull then
+        Parameters[42].Value := 0
+      else
+        Parameters[42].Value := mDocumentoItbisCosto.Value;
+
+      if mDocumentoPendEnvioEcf.IsNull then
+        Parameters[43].Value := False
+      else
+        Parameters[43].Value := mDocumentoPendEnvioEcf.Value;
+
       Parameters[44].Value := mDocumentoTipoNcf.Value;
       Parameters[45].Value := mDocumentoCodigoSeguridadEcf.Value;
       Parameters[46].Value := mDocumentoFechaFirmaDigital.Value;
@@ -861,7 +887,11 @@ begin
       Parameters[48].Value := mDocumentoCompFiscalModificado.Value;
       Parameters[49].Value := mDocumentoFechaCompFiscalModificado.Value;
       Parameters[50].Value := mDocumentoIdClaseGastoModificado.Value;
-      Parameters[51].Value := mDocumentoStatusEcf.Value;
+
+      if mDocumentoStatusEcf.IsNull or (Trim(mDocumentoStatusEcf.AsString) = '') then
+        Parameters[51].Value := 'PENDIENTE'
+      else
+        Parameters[51].Value := mDocumentoStatusEcf.Value;
 
       // 06/01/2009 JM
       Parameters[37].Value := mDocumentoOrdenCompra.Value;

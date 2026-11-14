@@ -197,7 +197,7 @@ type
     procedure AgregarImpuestos;
     procedure SetIdTrans(const Value: Integer);
     procedure registra_pago;
-    procedure SendEcf(Silencioso: Boolean = False);
+    procedure SendEcf(Silencioso: Boolean = False; ForzarEstado: Boolean = False);
     { Private declarations }
   protected
     procedure doNuevo; override;
@@ -293,6 +293,8 @@ begin
 end;
 
 procedure TfMantDocumentos.doGuardar;
+var
+  isInsert: Boolean;
 begin
 // if docdm.mDocumentoCompFiscal.AsString = '' then
 //    raise Exception.Create('No puede guardar documentos sin un NCF valido');
@@ -307,13 +309,15 @@ begin
       raise Exception.Create('Hay un descuadre en el documento, no puede guardarlo');
   end;
 
+  isInsert := (appestado = appInsert);
+
   inherited doGuardar();
 
   docdm.GuardarDocumento();
 
-  if (appestado = appInsert) and (dmDGII <> nil) and dmDGII.AutoEnviarEcfs then
+  if isInsert and (dmDGII <> nil) and dmDGII.AutoEnviarEcfs and (Copy(Trim(docdm.mDocumentoCompFiscal.AsString), 1, 1) = 'E') then
   begin
-    SendEcf(True);
+    SendEcf(True, True);
   end;
 
   {pagos := GetPagoCxP(docdm.mDocumentoGUIDDocumento.AsString, docdm.mDocumentoTotal.AsFloat);
@@ -550,6 +554,8 @@ begin
     btImprimir.Enabled := True;
 
   DistCosto.Enabled := False;
+  bSendECF.Enabled := (docdm.mDocumento.Active) and (docdm.mDocumentoIdDocumento.AsInteger > 0) and (Copy(Trim(docdm.mDocumentoCompFiscal.AsString), 1, 1) = 'E');
+  btnRefrescarECF.Enabled := (docdm.mDocumento.Active) and (docdm.mDocumentoIdDocumento.AsInteger > 0);
 
   cxGridReadOnly(True, grDetalle);
   cxGridReadOnly(True, GridImpuestos);
@@ -563,6 +569,8 @@ begin
   btImpuestos.Enabled := True;
   btImprimir.Enabled := False;
   DistCosto.Enabled := True;
+  bSendECF.Enabled := False;
+  btnRefrescarECF.Enabled := False;
 
   cxGridReadOnly(False, grDetalle);
   cxGridReadOnly(False, GridImpuestos);
@@ -576,6 +584,8 @@ begin
   btImpuestos.Enabled := True;
   btImprimir.Enabled := False;
   DistCosto.Enabled := True;
+  bSendECF.Enabled := False;
+  btnRefrescarECF.Enabled := False;
 
   cxGridReadOnly(False, grDetalle);
   cxGridReadOnly(False, GridImpuestos);
@@ -771,9 +781,15 @@ begin
 end;
 
 
-procedure TfMantDocumentos.SendEcf(Silencioso: Boolean = False);
+procedure TfMantDocumentos.SendEcf(Silencioso: Boolean = False; ForzarEstado: Boolean = False);
 begin
-  if (AppEstado = appInsert) or (AppEstado = appEdit) then
+  if (Copy(Trim(docdm.mDocumentoCompFiscal.AsString), 1, 1) <> 'E') then
+  begin
+    if not Silencioso then ShowMessage('Este documento no es un comprobante fiscal electronico (e-CF).');
+    Exit;
+  end;
+
+  if not ForzarEstado and ((AppEstado = appInsert) or (AppEstado = appEdit)) then
   begin
     if not Silencioso then ShowMessage('Debe guardar el documento primero.');
     Exit;

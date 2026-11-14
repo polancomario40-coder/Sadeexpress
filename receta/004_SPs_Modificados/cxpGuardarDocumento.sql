@@ -172,7 +172,7 @@ CREATE OR ALTER PROCEDURE dbo.cxpGuardarDocumento
 
 	@itbisCosto DECIMAL(19,2) = 0,
 
-    @PendEnvioEcf BIT = NULL,
+    @PendEnvioEcf BIT = 0,
 
     @TipoNcf VARCHAR(2) = NULL,
 
@@ -586,7 +586,7 @@ AS
 
 					 @itbisCosto,
 
-                     @PendEnvioEcf,
+                     ISNULL(@PendEnvioEcf, 0),
 
                      @TipoNcf,
 
@@ -602,7 +602,7 @@ AS
 
                      @IdClaseGastoModificado,
 
-                     @StatusEcf
+                     ISNULL(NULLIF(@StatusEcf, ''), 'PENDIENTE')
 
                     )  
 
@@ -794,7 +794,7 @@ AS
 
 					itbisCosto = @itbisCosto,
 
-                    PendEnvioEcf = @PendEnvioEcf,
+                    PendEnvioEcf = ISNULL(@PendEnvioEcf, PendEnvioEcf),
 
                     TipoNcf = @TipoNcf,
 
@@ -810,7 +810,7 @@ AS
 
                     IdClaseGastoModificado = @IdClaseGastoModificado,
 
-                    StatusEcf = @StatusEcf 
+                    StatusEcf = ISNULL(NULLIF(@StatusEcf, ''), StatusEcf) 
 
                                                                                                                                                                                                                                
 

@@ -349,6 +349,15 @@ type
     OrdComp2FactFacturable: TBooleanField;
     ClienteActidCondicion: TStringField;
     rptFacturaTipoNCF: TStringField;
+    rptFacturaCodigoSeguridadEcf: TStringField;
+    rptFacturaFechaFirmaDigital: TDateTimeField;
+    rptFacturaFormaPago: TStringField;
+    rptFacturaValUrl: TStringField;
+    rptFacturaBalance: TBCDField;
+    rptFacturaFecsaldo: TDateTimeField;
+    rptFacturaAbonopendiente: TFloatField;
+    rptFacturaReferenciaDet: TStringField;
+    rptFacturafechadet: TDateTimeField;
     qryCondicionNoCreditoCheck: TBooleanField;
     RSTasa: TBCDField;
     dxDBEdit24: TdxDBEdit;
@@ -569,6 +578,8 @@ type
     dxDBEdit27: TdxDBEdit;
     RSTipoDocumento: TStringField;
     RSTipoNcf: TStringField;
+    RSCodigoSeguridadEcf: TStringField;
+    RSStatusEcf: TStringField;
     ClienteActTipoCompFiscal: TStringField;
     dxDBEdit28: TdxDBEdit;
     Label33: TLabel;
@@ -1015,17 +1026,7 @@ begin
         s := Trim(VarToStr(dm.GetDefault('Client_EDIT_CLI')));
     except end;
   end;
-  if (s = '') or (s <> '1') then begin
-    try
-      with dm.GetDataSet('SELECT CAST(Valor as varchar(50)) as Valor FROM Defaults WHERE Clave = ''Client_EDIT_CLI''', Null) do
-      try
-        if not IsEmpty then
-          s := Trim(FieldByName('Valor').AsString);
-      finally
-        Free;
-      end;
-    except end;
-  end;
+
   Result := (s = '1');
 end;
 
@@ -1078,13 +1079,22 @@ begin
 end;
 
 procedure TFactura.browsebotonstate;
+var
+  statusEcfVal: string;
 begin
   inherited;
-   bSendEcf.Enabled := (not rs.IsEmpty)
-                       and RS.Active
-                       and (dm.rsEcfStatus.FieldByName('StatusEcf').AsString = 'PENDIENTE')
-                       and (Copy(RSCompFiscal.Value,1,1) = 'E')
-                       and dm.PuedeEnviarEcfs;
+
+  statusEcfVal := '';
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
+    statusEcfVal := Trim(RSStatusEcf.AsString)
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
+    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+
+  bSendEcf.Enabled := (not rs.IsEmpty)
+                      and RS.Active
+                      and (statusEcfVal = 'PENDIENTE')
+                      and (Copy(Trim(RSCompFiscal.AsString), 1, 1) = 'E')
+                      and (dm <> nil) and dm.PuedeEnviarEcfs;
 
   FindCliente.enabled := false;
   dxDBEdit11.ReadOnly := True;
@@ -1376,6 +1386,16 @@ begin
   if rsidFactura.IsNull then rsEspec.Parameters[1].Value := NULL else rsEspec.Parameters[1].Value := rsidFActura.Value;
   rsEspec.open;
 
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Parameters.Count >= 3) then
+  begin
+    try
+      dm.rsEcfStatus.Close;
+      dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
+      dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
+      dm.rsEcfStatus.Open;
+    except
+    end;
+  end;
 end;
 
 procedure TFactura.RSDetPrecioValidate(Sender: TField);
@@ -2881,49 +2901,58 @@ procedure TFactura.RSBeforePost(DataSet: TDataSet);
 var
   v: Variant;
   sec : TSecuenciaNCF;
+  tNcf: string;
 begin
   inherited;
-  if rs.State = dsInsert then begin
 
-    if rsCompFiscal.Asstring = ''  then
+  tNcf := Trim(rsTipoNCF.AsString);
+  if tNcf = '' then
+  begin
+    if (ClienteAct <> nil) and (ClienteAct.Active) and (not ClienteActTipoCompFiscal.IsNull) then
+      tNcf := Trim(ClienteActTipoCompFiscal.AsString);
+    if tNcf = '' then
+      tNcf := '01';
+    rsTipoNCF.Value := tNcf;
+  end;
+
+  if rs.State = dsInsert then begin
+    if rsCompFiscal.AsString = '' then
     begin
-    // Si no es credito, si la condicion es CreditoconNCF, o si el parametro FACT_CREDITO_NCF esta activo (por defecto <> '0')
-    if (RSCredito.value=False) or (RSidCondicion.AsString ='CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
-    begin
-      rsTipoDocumento.value:='FACTURA' ;
-      sec := dm.GetCompFiscal(ComputerName(), rsTipoNCF.Value);
-      if sec.Cancelado = False then
+      // Si no es credito, si la condicion es CreditoconNCF, o si el parametro FACT_CREDITO_NCF esta activo (por defecto <> '0')
+      if (RSCredito.Value = False) or (RSidCondicion.AsString = 'CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
       begin
-        rsCompFiscal.Value := sec.secuencia;
-        rsFechaVenceNCF.Value := sec.VencimientoNCF
+        rsTipoDocumento.Value := 'FACTURA';
+        sec := dm.GetCompFiscal(ComputerName(), tNcf);
+        if sec.Cancelado = False then
+        begin
+          rsCompFiscal.Value := sec.secuencia;
+          rsFechaVenceNCF.Value := sec.VencimientoNCF;
+        end
+        else
+          raise Exception.Create('No se genero la secuencia de comprobantes fiscales, verifique que tenga disponible..');
       end
       else
-        raise Exception.Create('No se genero la secuencia de comprobantes fiscales, verifique que tenga disponible..');
-    end
-    else
-    rsTipoDocumento.value:='PROFORMA'  ;
-   end;
+        rsTipoDocumento.Value := 'PROFORMA';
+    end;
   end
+  else
+    if (rsDatosEstadoBalance.Value <> 0) and (dm.GetDefaultStr('FACT_CREDITO_NCF') = '0') and (RSidCondicion.AsString <> 'CreditoconNCF') then
+      rsTipoDocumento.Value := 'PROFORMA'
     else
-    if (rsDatosEstadoBalance.Value<>0) and (dm.GetDefaultStr('FACT_CREDITO_NCF') = '0') and (RSidCondicion.AsString <> 'CreditoconNCF') then
-    rsTipoDocumento.value:='PROFORMA'
-    else
+    begin
+      if (rsCompFiscal.AsString = '') or (RSidCondicion.AsString = 'CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
       begin
-
-         if (rsCompFiscal.Asstring = '') or (RSidCondicion.AsString='CreditoconNCF') or (dm.GetDefaultStr('FACT_CREDITO_NCF') <> '0') then
-         begin
-         sec := dm.GetCompFiscal(ComputerName(), rsTipoNCF.Value);
-         if sec.Cancelado = False then
-          begin
-            rsCompFiscal.Value := sec.secuencia;
-            rsFechaVenceNCF.Value := sec.VencimientoNCF ;
-            rsTipoDocumento.value:='FACTURA'
-         end
-         else
-            raise Exception.Create('No se genero la secuencia de comprobantes fiscales, verifique que tenga disponible..');
-         end
-
-   end;
+        sec := dm.GetCompFiscal(ComputerName(), tNcf);
+        if sec.Cancelado = False then
+        begin
+          rsCompFiscal.Value := sec.secuencia;
+          rsFechaVenceNCF.Value := sec.VencimientoNCF;
+          rsTipoDocumento.Value := 'FACTURA';
+        end
+        else
+          raise Exception.Create('No se genero la secuencia de comprobantes fiscales, verifique que tenga disponible..');
+      end;
+    end;
 end;
 
 procedure TFactura.ALocalizarExecute(Sender: TObject);
@@ -3137,8 +3166,16 @@ begin
 end;
 
 procedure TFactura.SendEcf(const confirm: Boolean = true);
+var
+  statusEcfVal: string;
 begin
-  if (dm.rsEcfStatus.FieldByName('StatusEcf').AsString <> 'PENDIENTE') or (Copy(RSCompFiscal.Value,1,1) <> 'E') then
+  statusEcfVal := '';
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
+    statusEcfVal := Trim(RSStatusEcf.AsString)
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
+    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+
+  if (statusEcfVal <> 'PENDIENTE') or (Copy(Trim(RSCompFiscal.AsString), 1, 1) <> 'E') then
     Exit;
     
   if confirm then begin
@@ -3156,24 +3193,40 @@ begin
 end;
 
 procedure TFactura.bSendEcfClick(Sender: TObject);
+var
+  statusEcfVal: string;
 begin
   inherited;
   if (appEstado <> appBrowse) or
      (not rs.Active) or
-     (rs.isempty()) or
-     (rsCancelado.Value) or
-     (dm.rsEcfStatus.FieldByName('StatusEcf').AsString <> 'PENDIENTE') then
+     (rs.IsEmpty()) or
+     (rsCancelado.Value) then
        Exit;
+
+  statusEcfVal := '';
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
+    statusEcfVal := Trim(RSStatusEcf.AsString)
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
+    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+
+  if statusEcfVal <> 'PENDIENTE' then
+    Exit;
 
   SendEcf(true);
 end;
 
 procedure TFactura.bRefreshClick(Sender: TObject);
 begin
-  dm.rsEcfStatus.Close;
-  dm.rsEcfStatus.Parameters[1].Value:=RSidFactura.Value;
-  dm.rsEcfStatus.Parameters[2].Value:=RSClienteRNC.Value;
-  dm.rsEcfStatus.Open;
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Parameters.Count >= 3) then
+  begin
+    try
+      dm.rsEcfStatus.Close;
+      dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
+      dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
+      dm.rsEcfStatus.Open;
+    except
+    end;
+  end;
 end;
 
 end.
