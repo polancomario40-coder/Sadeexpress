@@ -1085,14 +1085,16 @@ begin
   inherited;
 
   statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
-    statusEcfVal := Trim(RSStatusEcf.AsString)
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
-    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else
+    statusEcfVal := 'PENDIENTE';
 
   bSendEcf.Enabled := (not rs.IsEmpty)
                       and RS.Active
-                      and (statusEcfVal = 'PENDIENTE')
+                      and ((statusEcfVal = 'PENDIENTE') or (statusEcfVal = 'ERROR'))
                       and (Copy(Trim(RSCompFiscal.AsString), 1, 1) = 'E')
                       and (dm <> nil) and dm.PuedeEnviarEcfs;
 
@@ -3169,13 +3171,18 @@ procedure TFactura.SendEcf(const confirm: Boolean = true);
 var
   statusEcfVal: string;
 begin
-  statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
-    statusEcfVal := Trim(RSStatusEcf.AsString)
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
-    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+  if (Copy(Trim(RSCompFiscal.AsString), 1, 1) <> 'E') then
+    Exit;
 
-  if (statusEcfVal <> 'PENDIENTE') or (Copy(Trim(RSCompFiscal.AsString), 1, 1) <> 'E') then
+  statusEcfVal := '';
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else
+    statusEcfVal := 'PENDIENTE';
+
+  if (statusEcfVal <> 'PENDIENTE') and (statusEcfVal <> 'ERROR') then
     Exit;
     
   if confirm then begin
@@ -3197,20 +3204,44 @@ var
   statusEcfVal: string;
 begin
   inherited;
-  if (appEstado <> appBrowse) or
-     (not rs.Active) or
-     (rs.IsEmpty()) or
-     (rsCancelado.Value) then
-       Exit;
+
+  if (appEstado in [appInsert, appEdit]) then
+  begin
+    ShowMessage('Debe guardar la factura primero antes de enviar el e-CF.');
+    Exit;
+  end;
+
+  if (not rs.Active) or (rs.IsEmpty()) then
+  begin
+    ShowMessage('No hay ninguna factura activa para enviar.');
+    Exit;
+  end;
+
+  if (rsCancelado.Value) then
+  begin
+    ShowMessage('Esta factura esta anulada, no puede ser enviada.');
+    Exit;
+  end;
+
+  if (Copy(Trim(RSCompFiscal.AsString), 1, 1) <> 'E') then
+  begin
+    ShowMessage('Esta factura no tiene un comprobante fiscal electronico (e-CF).'#13#10'Comprobante actual: ' + RSCompFiscal.AsString);
+    Exit;
+  end;
 
   statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) then
-    statusEcfVal := Trim(RSStatusEcf.AsString)
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) then
-    statusEcfVal := Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString);
+  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
+  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else
+    statusEcfVal := 'PENDIENTE';
 
-  if statusEcfVal <> 'PENDIENTE' then
+  if (statusEcfVal <> 'PENDIENTE') and (statusEcfVal <> 'ERROR') then
+  begin
+    ShowMessage('El estado actual del e-CF es: ' + statusEcfVal + #13#10'Solo se pueden enviar comprobantes en estado PENDIENTE.');
     Exit;
+  end;
 
   SendEcf(true);
 end;
