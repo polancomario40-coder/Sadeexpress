@@ -884,6 +884,11 @@ begin
   fCreditoAutorizado := False;
   DescAutorizado := 0;
 
+  try
+    PageControl1.ActivePage := TabSheet8;
+  except
+  end;
+
   computer := ComputerName();
   ALMACENDEFAULT := dm.GetPCSetting('ALMACENDEFAULT');
   if ALMACENDEFAULT = '' then
@@ -1388,7 +1393,7 @@ begin
   if rsidFactura.IsNull then rsEspec.Parameters[1].Value := NULL else rsEspec.Parameters[1].Value := rsidFActura.Value;
   rsEspec.open;
 
-  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Parameters.Count >= 3) then
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) then
   begin
     try
       dm.rsEcfStatus.Close;
@@ -3195,6 +3200,18 @@ begin
   end;
 
   Localizar(rsIdFactura.value);
+
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) then
+  begin
+    try
+      dm.rsEcfStatus.Close;
+      dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
+      dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
+      dm.rsEcfStatus.Open;
+    except
+    end;
+  end;
+
   if confirm then
     ShowMessage('El ecf ha sido enviado al sistema de procesamiento'#13#10' en instantes podra ver el resultado');
 end;
@@ -3248,7 +3265,7 @@ end;
 
 procedure TFactura.bRefreshClick(Sender: TObject);
 begin
-  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Parameters.Count >= 3) then
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) then
   begin
     try
       dm.rsEcfStatus.Close;
