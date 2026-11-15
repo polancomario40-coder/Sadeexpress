@@ -584,65 +584,10 @@ inherited Factura: TFactura
     Top = 498
     Width = 545
     Height = 140
-    ActivePage = TabSheet8
+    ActivePage = TabSheet1
     Anchors = [akLeft, akRight, akBottom]
     MultiLine = True
     TabOrder = 18
-    object TabSheet8: TTabSheet
-      Caption = 'Info ECF'
-      ImageIndex = 8
-      DesignSize = (
-        478
-        96)
-      object lblEcfCodSeguridad: TLabel
-        Left = 6
-        Top = 47
-        Width = 74
-        Height = 13
-        Caption = 'Cod. seguridad:'
-      end
-      object lblEcfEstado: TLabel
-        Left = 5
-        Top = 7
-        Width = 36
-        Height = 13
-        Caption = 'Estado:'
-      end
-      object dxDBEditEcfCodSeguridad: TdxDBEdit
-        Left = 5
-        Top = 61
-        Width = 116
-        Enabled = False
-        TabOrder = 0
-        Anchors = [akLeft, akTop, akRight]
-        DataField = 'CodigoSeguridadEcf'
-        DataSource = dsEcfStatus
-        StyleController = dm.dxEstilo
-      end
-      object dxDBEditEcfEstado: TdxDBEdit
-        Left = 4
-        Top = 21
-        Width = 116
-        Enabled = False
-        TabOrder = 1
-        Anchors = [akLeft, akTop, akRight]
-        DataField = 'StatusEcf'
-        DataSource = dsEcfStatus
-        StyleController = dm.dxEstilo
-      end
-      object cxDBMemoEcfError: TcxDBMemo
-        Left = 152
-        Top = 2
-        Width = 326
-        Height = 92
-        TabStop = False
-        DataBinding.DataField = 'ultError'
-        DataBinding.DataSource = dsEcfStatus
-        Properties.ReadOnly = True
-        Style.LookAndFeel.NativeStyle = True
-        TabOrder = 2
-      end
-    end
     object TabSheet1: TTabSheet
       Caption = 'Notas Facturas'
       DesignSize = (
@@ -939,6 +884,60 @@ inherited Factura: TFactura
         StyleController = dm.dxEstilo
         Height = 91
       end
+        end
+  object TabSheet8: TTabSheet
+        Caption = 'Info ECF'
+        ImageIndex = 8
+        DesignSize = (
+          478
+          96)
+        object lblEcfCodSeguridad: TLabel
+          Left = 6
+          Top = 47
+          Width = 74
+          Height = 13
+          Caption = 'Cod. seguridad:'
+        end
+        object lblEcfEstado: TLabel
+          Left = 5
+          Top = 7
+          Width = 36
+          Height = 13
+          Caption = 'Estado:'
+        end
+        object dxDBEditEcfCodSeguridad: TdxDBEdit
+          Left = 5
+          Top = 61
+          Width = 116
+          Enabled = False
+          TabOrder = 0
+          Anchors = [akLeft, akTop, akRight]
+          DataField = 'CodigoSeguridadEcf'
+          DataSource = dsEcfStatus
+          StyleController = dm.dxEstilo
+        end
+        object dxDBEditEcfEstado: TdxDBEdit
+          Left = 4
+          Top = 21
+          Width = 116
+          Enabled = False
+          TabOrder = 1
+          Anchors = [akLeft, akTop, akRight]
+          DataField = 'StatusEcf'
+          DataSource = dsEcfStatus
+          StyleController = dm.dxEstilo
+        end
+        object cxDBMemoEcfError: TcxDBMemo
+          Left = 152
+          Top = 2
+          Width = 326
+          Height = 92
+          TabStop = False
+          DataBinding.DataField = 'ultError'
+          DataBinding.DataSource = dsEcfStatus
+          Properties.ReadOnly = True
+          Style.LookAndFeel.NativeStyle = True
+          TabOrder = 2
         end
       end
   end

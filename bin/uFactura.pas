@@ -885,6 +885,7 @@ begin
   DescAutorizado := 0;
 
   try
+    TabSheet8.PageIndex := 0;
     PageControl1.ActivePage := TabSheet8;
   except
   end;
