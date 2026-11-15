@@ -331,7 +331,6 @@ type
     mDocumentoTipoNcf: TStringField;
     mDocumentoFechaVenceNCF: TDateTimeField;
     mDocumentoCodigoSeguridadEcf: TStringField;
-    mDocumentoUltError: TStringField;
     mDocumentoStatusEcf: TStringField;
     mDocumentoCompFiscalModificado: TStringField;
     mDocumentoFechaCompFiscalModificado: TDateTimeField;
