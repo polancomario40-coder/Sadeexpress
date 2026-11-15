@@ -1091,10 +1091,10 @@ begin
   inherited;
 
   statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
-    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
     statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
   else
     statusEcfVal := 'PENDIENTE';
 
@@ -1401,6 +1401,8 @@ begin
       dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
       dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
       dm.rsEcfStatus.Open;
+      if appEstado = appBrowse then
+        browsebotonstate;
     except
     end;
   end;
@@ -3181,10 +3183,10 @@ begin
     Exit;
 
   statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
-    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
     statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
   else
     statusEcfVal := 'PENDIENTE';
 
@@ -3209,6 +3211,8 @@ begin
       dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
       dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
       dm.rsEcfStatus.Open;
+      if appEstado = appBrowse then
+        browsebotonstate;
     except
     end;
   end;
@@ -3248,10 +3252,10 @@ begin
   end;
 
   statusEcfVal := '';
-  if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
-    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
-  else if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
+  if (dm <> nil) and (dm.rsEcfStatus <> nil) and (dm.rsEcfStatus.Active) and (dm.rsEcfStatus.FindField('StatusEcf') <> nil) and (Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString) <> '') then
     statusEcfVal := UpperCase(Trim(dm.rsEcfStatus.FieldByName('StatusEcf').AsString))
+  else if (RSStatusEcf <> nil) and (not RSStatusEcf.IsNull) and (Trim(RSStatusEcf.AsString) <> '') then
+    statusEcfVal := UpperCase(Trim(RSStatusEcf.AsString))
   else
     statusEcfVal := 'PENDIENTE';
 
@@ -3273,6 +3277,8 @@ begin
       dm.rsEcfStatus.Parameters[1].Value := RSidFactura.Value;
       dm.rsEcfStatus.Parameters[2].Value := RSClienteRNC.Value;
       dm.rsEcfStatus.Open;
+      if appEstado = appBrowse then
+        browsebotonstate;
     except
     end;
   end;
